@@ -1,7 +1,5 @@
 <?php
-include 'DB.php';
-requireonce(_ROOT__ . "models/UserModel.php");
-
+require_once(__DIR__ . '/../models/UsersModel.php');
 ?>
 <?php
 class Doctor extends User {
@@ -52,10 +50,22 @@ class Doctor extends User {
         }
     }
 
+    
     public function getSlots() {
-        $stmt = $this->db->prepare("SELECT * FROM doctor WHERE doctor_id = ?");
-        $stmt->execute([$this->id]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $sql = "SELECT * FROM doctor WHERE doctor_id = ?";
+        $stmt = $GLOBALS['conn']->prepare($sql);
+        $doctorId = $this->getID();
+        $stmt->bind_param("i", $doctorId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+    
+        $slots = [];
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $slots[] = $row;
+            }
+        }
+        return $slots;
     }
 }
 ?>
