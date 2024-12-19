@@ -21,8 +21,8 @@ function confirmDelete(userId) {
 
     // Handle confirm delete button
     document.getElementById("confirmDeleteBtn").onclick = function() {
-        // Call the delete action
-        window.location.href = 'deleteuser.php?id=' + userIdToDelete;
+        // Redirect with proper query string
+        window.location.href = 'Admin.php?action=Delete&id=' + userIdToDelete;
     };
 }
 
@@ -30,7 +30,6 @@ function closeModal() {
     // Hide the modal
     document.getElementById("confirmModal").style.display = "none";
 }
-
 
   function validateForm() {
     let isValid = true;

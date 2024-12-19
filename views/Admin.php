@@ -1,10 +1,12 @@
 <?php
-require_once(__DIR__ . '/../public/index.php');
+
 require_once __DIR__ . '/../controllers/AdminController.php';
 
 $controller = new AdminController();
 $users = $controller->index();
-// die(); 
+if (isset($_GET['action']) && $_GET['action'] == 'Delete' && isset($_GET['id'])) {
+  $controller->delete();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -48,7 +50,6 @@ $users = $controller->index();
             <li class="nav-item">
               <a class="nav-link" href="reports.php">Reports</a>
             </li>
-           
           </ul>
         </div> 
       </div>
@@ -92,7 +93,7 @@ $users = $controller->index();
     <h2 class="text-center mt-5">Admin Dashboard Overview</h2>
     <p class="text-center">Here you can manage all aspects of the system, from user accounts to appointments and reports.</p>
     <div class="add-btn">
-      <a href="adduser.php" class="btn btn-sm btn-primary">Add User</a>
+      <a href="AddUser.php" class="btn btn-sm btn-primary">Add User</a>
     </div>
     <table class="table table-striped">
         <thead>
@@ -105,6 +106,7 @@ $users = $controller->index();
                 <th>Address</th>
                 <th>UserType</th>
                 <th>DOB</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -118,24 +120,29 @@ $users = $controller->index();
                         <td><?php echo $counter++; ?></td>
                         <td><?php echo htmlspecialchars($user['Name']); ?></td>
                         <td><?php echo htmlspecialchars($user['Email']); ?></td>
-                        <td><?php echo htmlspecialchars($user['gender']); ?></td>
                         <td><?php echo htmlspecialchars($user['phone']); ?></td>
+                        <td><?php echo htmlspecialchars($user['gender']); ?></td>
                         <td><?php echo htmlspecialchars($user['Address']); ?></td>
                         <td><?php echo htmlspecialchars($user['UserType']); ?></td>
                         <td><?php echo htmlspecialchars($user['DOB']); ?></td>
+                        <td>
+                            <a href="Edituser.php?id=<?php echo htmlspecialchars($user['ID']); ?>" class="btn btn-sm btn-primary">Edit</a>
+                            <<button class="btn btn-sm btn-danger" onclick="confirmDelete(<?php echo htmlspecialchars($user['ID']); ?>)">Delete</button>
+                        </td>
                     </tr>
             <?php 
                 endforeach; 
             } else { ?>
                 <tr>
-                    <td colspan="7">No users found</td>
+                    <td colspan="9">No users found</td>
                 </tr>
             <?php } ?>
         </tbody>
     </table>
   </div>
   <!-- PopUp Container -->
-  <div id="confirmModal" class="modal" style="display:none;">
+<!-- PopUp Container -->
+<div id="confirmModal" class="modal" style="display:none;">
     <div class="modal-content">
         <p>Are you sure you want to delete?</p>
         <div class="modal-buttons">
@@ -143,7 +150,7 @@ $users = $controller->index();
             <button id="cancelDeleteBtn" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
         </div>
     </div>
-</div>
+  </div>
 
 
   <!-- Footer -->
@@ -166,4 +173,3 @@ $users = $controller->index();
 
 </body>
 </html>
-
