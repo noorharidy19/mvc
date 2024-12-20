@@ -4,7 +4,7 @@ require_once __DIR__ . '/../controllers/AdminController.php';
 
 $controller = new AdminController();
 $users = $controller->index();
-if (isset($_GET['action']) && $_GET['action'] == 'Delete' && isset($_GET['id'])) {
+if (isset($_GET['action']) && $_GET['action'] == 'Delete' && isset($_GET['ID'])) {
   $controller->delete();
 }
 ?>
@@ -127,7 +127,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'Delete' && isset($_GET['id']))
                         <td><?php echo htmlspecialchars($user['DOB']); ?></td>
                         <td>
                             <a href="Edituser.php?id=<?php echo htmlspecialchars($user['ID']); ?>" class="btn btn-sm btn-primary">Edit</a>
-                            <<button class="btn btn-sm btn-danger" onclick="confirmDelete(<?php echo htmlspecialchars($user['ID']); ?>)">Delete</button>
+                            <<button action="delete" class="btn btn-sm btn-danger" onclick="confirmDelete(<?php echo htmlspecialchars($user['ID']); ?>)">Delete</button>
                         </td>
                     </tr>
             <?php 
