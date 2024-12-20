@@ -131,3 +131,23 @@ body {
                 transform: translateY(-15px);
             }
         }
+      
+        #image-button {
+            cursor: pointer;
+            display: inline-block;
+            width: 24px;
+            height: 24px; 
+        }
+        #image-input {
+            display: none;
+        }
+        .message {
+            margin: 5px 0;
+        }
+        .message.user {
+            text-align: right;
+        }
+        .message.bot {
+            text-align: left;
+        }
+

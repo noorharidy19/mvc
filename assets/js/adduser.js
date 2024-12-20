@@ -22,7 +22,7 @@ function confirmDelete(userId) {
     // Handle confirm delete button
     document.getElementById("confirmDeleteBtn").onclick = function() {
         // Redirect with proper query string
-        window.location.href = 'Admin.php?action=Delete&id=' + userIdToDelete;
+        window.location.href = 'Admin.php?action=Delete&ID=' + userIdToDelete;
     };
 }
 

@@ -3,8 +3,8 @@ require_once ('../models/AdminModel.php');
 
 class AdminController {
     public function delete() {
-        if (isset($_GET['id'])) {
-            $ID = intval($_GET['id']); // Sanitize the ID
+        if (isset($_GET['ID'])) {
+            $ID = intval($_GET['ID']); // Sanitize the ID
             if (Admin::deleteUser($ID)) {
                 echo "User deleted successfully!";
                 header("Location: Admin.php?message=UserDeleted"); // Redirect to avoid duplicate execution
@@ -77,7 +77,7 @@ class AdminController {
         }
     
     public function index() {
-        $adminModel = new Admin(5);
+        $adminModel = new Admin(1);
         $users = $adminModel->getUser(); // Fetch users properly
         return $users;
         // include(__DIR__ . '/../views/Admin.php'); // Pass data to the view
