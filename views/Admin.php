@@ -1,7 +1,10 @@
 <?php
 
 require_once __DIR__ . '/../controllers/AdminController.php';
+require_once(__DIR__ . '/../includes/auth.php');
 
+// Check if the user is authenticated as a patient
+checkAuthentication('Admin');
 $controller = new AdminController();
 $users = $controller->index();
 if (isset($_GET['action']) && $_GET['action'] == 'Delete' && isset($_GET['ID'])) {
