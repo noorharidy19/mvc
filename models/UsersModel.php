@@ -160,24 +160,61 @@ class User {
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 
-    public static function editUser($name, $email, $password, $phone, $address, $DOB, $gender, $ID) {
-        global $conn;
-        $sql = "UPDATE users SET 
-                    Name='$name', 
-                    Email='$email', 
-                    Password='$password', 
-                    phone='$phone', 
-                    Address='$address', 
-                    DOB='$DOB', 
-                    gender='$gender' 
-                WHERE ID='$ID'";
-
-        if (mysqli_query($GLOBALS['conn'], $sql)) {
-            return true;
-        } else {
-            error_log("Failed to execute query: " . mysqli_error($conn));
-            return false;
+  
+        public static function login() {
+            global $conn;
+    
+            if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                // Retrieve the form inputs
+                $emailOrPhone = $_POST['loginEmailOrPhone'];
+                $password = $_POST['loginPassword'];
+    
+                // Prepare a SQL statement to prevent SQL injection
+                $stmt = $conn->prepare("SELECT * FROM users WHERE (Email = ? OR phone = ?) LIMIT 1");
+                $stmt->bind_param("ss", $emailOrPhone, $emailOrPhone);
+                $stmt->execute();
+                $result = $stmt->get_result();
+    
+                // Check if a user record was found
+                if ($result->num_rows > 0) {
+                    $user = $result->fetch_assoc();
+    
+                    // Verify the password
+                    if (password_verify($password, $user['Password'])) { // Assuming passwords are hashed
+                        session_start();
+                        $_SESSION['user_id'] = $user['ID'];
+                        $_SESSION['Email'] = $user['Email'];
+                        $_SESSION['UserType'] = $user['UserType']; // Store userType in session
+    
+                        // Check userType for redirection
+                        if ($user['UserType'] === 'Admin') {
+                            header("Location: Admin.php"); // Redirect to admin dashboard
+                        } else if ($user['UserType'] === 'Doctor') {
+                            header("Location: Doctor.php"); // Redirect to doctor dashboard
+                        } else {
+                            header("Location: Patient.php"); // Redirect to patient dashboard
+                        }
+                        exit();
+                    } else {
+                        $_SESSION['error'] = "Invalid email/phone or password.";
+                        return false;
+                    }
+                } else {
+                    $_SESSION['error'] = "User not found.";
+                    return false;
+                }
+    
+                $stmt->close();
+                $conn->close();
+            }
         }
-    }
+        public static function logout() {
+            session_start();
+            session_unset();
+            session_destroy();
+            header("Location: index.php");
+            exit();
+        }
+   
 }
 ?>
