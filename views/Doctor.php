@@ -1,16 +1,19 @@
 <?php
-require_once(__DIR__ . '/../public/index.php');
-require_once __DIR__ . '/../controllers/DoctorController.php';
+require_once(__DIR__ . '/../includes/auth.php');
+require_once(__DIR__ . '/../controllers/DoctorController.php');
 
+// Check if the user is authenticated as a doctor
+checkAuthentication('Doctor');
+
+// Retrieve the ID of the current doctor from the session
+$doctorId = $_SESSION['user_id'];
+
+// Create an instance of the DoctorController
 $controller = new DoctorController();
-$controller->addSlotAction(13);
-// die(); 
-?>
-<?php // Start the session
 
-// Check if the user is logged in and is a doctor
-$isLoggedIn = isset($_SESSION['user_id']) && $_SESSION['UserType'] === 'doctor';
-?>
+// Call the addSlotAction method with the doctor ID
+$controller->addSlotAction($doctorId);
+?> 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -88,15 +91,13 @@ $isLoggedIn = isset($_SESSION['user_id']) && $_SESSION['UserType'] === 'doctor';
               <li class="nav-item">
                   <a class="nav-link" href="contact.php">Contact</a>
               </li>
-              <?php if ($isLoggedIn): ?>
+             
                   <li class="nav-item">
                       <a class="btn btn-primary ml-lg-3" href="logout.php">Logout</a>
                   </li>
-              <?php else: ?>
-                  <li class="nav-item">
-                      <a class="btn btn-primary ml-lg-3" href="signup.php">Login / Register</a>
-                  </li>
-              <?php endif; ?>
+             
+                 
+                
               <li class="nav-item">
                   <a class="nav-link" href="chatbot.php" id="chatbot-icon" title="chatbot">
                       <i class="fas fa-robot"></i>
