@@ -4,8 +4,8 @@ require_once(__DIR__ . "/../models/UsersModel.php");
 
 Class Patient extends User{
 
-    public function __construct($name, $email, $password, $phone, $address, $userType, $dob) {
-        parent::__construct($name, $email, $password, $phone, $address, $userType, $dob);
+    public function __construct() {
+      
     }
 
     public function signup() {
@@ -19,7 +19,8 @@ Class Patient extends User{
         // Check if email already exists
         $emailCheckQuery = "SELECT * FROM users WHERE email = ?";
         $stmt = $conn->prepare($emailCheckQuery);
-        $stmt->bind_param("s", $this->getEmail());
+        $email= $this->getEmail();
+        $stmt->bind_param("s", $email);
         $stmt->execute();
         $result = $stmt->get_result();
 
@@ -34,16 +35,23 @@ Class Patient extends User{
 
         // Insert the user into the database
         $stmt = $conn->prepare("INSERT INTO users (name, email, password, phone, address, userType, dob) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("sssssss", $this->getName(), $this->getEmail(), $hashedPassword, $this->getPhone(), $this->getAddress(), $this->getUserType(), $this->getDob());
+        $name= $this->getName();
+        $email= $this->getEmail();
+        $phone= $this->getPhone();
+        $address= $this->getAddress();
+        $userType= $this->getUserType();
+        $dob= $this->getDob();
+        
+        $stmt->bind_param("sssssss", $name, $email, $hashedPassword, $phone, $address, $userType, $dob);
 
         if ($stmt->execute()) {
-            // Set the user ID for the newly created user
-            $this->ID = $stmt->insert_id;
-            $_SESSION['user_id'] = $this->ID; // Set session for the logged-in user
-            return true;
+            $_SESSION['user_id'] = $stmt->insert_id;
+            header("Location: index.php");
+            exit();
         } else {
-            error_log("Database Error: " . $stmt->error);
-            return false;
+            $_SESSION['error'] = "Sign-up failed. Please try again.";
+            header("Location: " . $_SERVER['PHP_SELF']);
+            exit();
         }
     }
 
