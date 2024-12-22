@@ -180,6 +180,13 @@ $controller->addSlotAction($doctorId);
                         <label for="endTime">End Time</label>
                         <input type="time" class="form-control" id="endTime" name="endTime" required>
                     </div>
+                    <div class="form-group">
+                        <label for="field">Field</label>
+                        <select class="form-control" id="field" name="field" required>
+    <option value="cardiology">Cardiology</option>
+    <option value="neurology">Neurology</option>
+    <option value="orthopaedics">Orthopaedics</option>
+</select>
                     <button type="submit" class="btn btn-primary">Add Slot</button>
                 </form>
             </div>
