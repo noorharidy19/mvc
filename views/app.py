@@ -1,6 +1,8 @@
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 from flask_socketio import SocketIO, join_room, leave_room, send
+from apscheduler.schedulers.background import BackgroundScheduler
+from datetime import datetime, timedelta
 import google.generativeai as genai
 from PIL import Image
 import io
@@ -8,6 +10,7 @@ import pytesseract
 import secrets
 from dotenv import load_dotenv
 import os
+import smtplib
 
 # Load environment variables from .env file
 load_dotenv()
@@ -22,6 +25,13 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = secrets.token_hex(16)
 socketio = SocketIO(app)
 CORS(app)  # Enable CORS for all routes
+
+# Initialize the scheduler
+scheduler = BackgroundScheduler()
+scheduler.start()
+
+# In-memory storage for reminders
+reminders = []
 
 # Hardcoded symptom-medication mapping
 symptom_medication_mapping = {
@@ -114,6 +124,15 @@ def extract_text_from_image(image):
     except Exception as e:
         return str(e)
 
+# Function to send email (placeholder, replace with actual implementation)
+def send_email(to_email, subject, message):
+    print(f"Sending email to {to_email}: {subject} - {message}")
+
+# Function to schedule a reminder
+def schedule_reminder(reminder):
+    run_date = datetime.strptime(reminder['time'], '%H:%M') + timedelta(days=1)
+    scheduler.add_job(send_email, 'date', run_date=run_date, args=[reminder['email'], 'Medication Reminder', reminder['message']])
+
 @app.route('/')
 def index():
     return render_template('chat.php')
@@ -121,8 +140,22 @@ def index():
 @app.route("/your-chatbot-endpoint", methods=["POST"])
 def chatbot():
     data = request.json
-    user_message = data.get("prompt", "")
-    # Your chatbot logic here
+    user_message = data.get("prompt", "").lower()
+    email = data.get("email", "")
+    
+    if "set reminder for my meds" in user_message:
+        # Extract time from the message (assuming the format "set reminder for my meds at HH:MM")
+        time = user_message.split("at")[-1].strip()
+        reminder = {
+            'email': email,
+            'time': time,
+            'message': 'Time to take your medication'
+        }
+        reminders.append(reminder)
+        schedule_reminder(reminder)
+        return jsonify({"response": "Sure, reminder set for your medication."})
+    
+    # Your existing chatbot logic here
     response = f"Hello! You said: {user_message}"
     return jsonify({"response": response})
 
@@ -186,6 +219,24 @@ def upload():
         return jsonify({"response": response.text})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route('/set_reminder', methods=['POST'])
+def set_reminder():
+    data = request.json
+    reminder = {
+        'email': data['email'],
+        'time': data['time'],
+        'message': data['message']
+    }
+    reminders.append(reminder)
+    schedule_reminder(reminder)
+    return jsonify({'status': 'success', 'message': 'Reminder set successfully'})
+
+@app.route('/get_reminders', methods=['GET'])
+def get_reminders():
+    email = request.args.get('email')
+    user_reminders = [reminder for reminder in reminders if reminder['email'] == email]
+    return jsonify({'reminders': user_reminders})
 
 @app.route('/chat/<room>')
 def chat(room):

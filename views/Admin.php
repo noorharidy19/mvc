@@ -80,7 +80,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'Delete' && isset($_GET['ID']))
       <div class="card text-center">
         <div class="card-body">
           <h5 class="card-title">Appointments Today</h5>
-          <p class="card-text"><i class="fas fa-calendar-check fa-3x"></i></p>
+          <p class="card-text"><a href="Calendar.php"><i class="fas fa-calendar-check fa-3x"></i></p>
         </div>
       </div>
 
